@@ -8,7 +8,7 @@ interface CalendarViewProps {
 }
 
 const CalendarView: React.FC<CalendarViewProps> = ({ events, onAddEvent }) => {
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 11, 6)); // Default Dec 2025
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   
@@ -65,11 +65,15 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onAddEvent }) => {
     }
 
     // Days
+    const today = new Date();
     for (let d = 1; d <= daysInMonth; d++) {
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), d);
       const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
       const dayEvents = events.filter(e => e.date === dateStr);
-      const isToday = d === 6 && currentDate.getMonth() === 11; // Mock today
+      
+      const isToday = d === today.getDate() && 
+                      currentDate.getMonth() === today.getMonth() && 
+                      currentDate.getFullYear() === today.getFullYear();
 
       days.push(
         <div 
@@ -77,7 +81,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onAddEvent }) => {
             onClick={() => openModal(date)}
             className={`h-32 bg-slate-800 border border-slate-700 rounded-lg m-0.5 p-2 relative hover:bg-slate-750 transition-colors group cursor-pointer`}
         >
-           <span className={`text-sm font-semibold ${isToday ? 'bg-indigo-600 w-6 h-6 rounded-full flex items-center justify-center text-white' : 'text-slate-400'}`}>
+           <span className={`text-sm font-semibold inline-flex items-center justify-center w-7 h-7 rounded-full ${isToday ? 'bg-indigo-600 text-white' : 'text-slate-400'}`}>
              {d}
            </span>
            <div className="mt-2 space-y-1 overflow-y-auto max-h-[80px] custom-scrollbar">
@@ -97,7 +101,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onAddEvent }) => {
     // Padding End (Render End)
     const totalDisplayed = firstDayOfMonth + daysInMonth;
     const remainingCells = 7 - (totalDisplayed % 7);
-    if (remainingCells < 7) {
+    if (remainingCells < 7 && remainingCells > 0) {
         for (let i = 0; i < remainingCells; i++) {
              days.push(<div key={`empty-end-${i}`} className="h-32 bg-slate-800/50 border border-slate-700/50 rounded-lg m-0.5 opacity-50"></div>);
         }
